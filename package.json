@@ -1,0 +1,20 @@
+{
+	"name": "gas-template",
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"build": "tsc && cp src/appsscript.json dist/appsscript.json",
+		"format": "biome format ./src",
+		"format:write": "biome format --write ./src",
+		"lint": "biome lint ./src",
+		"lint:write": "biome lint --write ./src",
+		"check": "biome check ./src",
+		"check:write": "biome check --write ./src",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.2.0",
+		"@types/google-apps-script": "^1.0.99",
+		"typescript": "^5.9.2"
+	}
+}
