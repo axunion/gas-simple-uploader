@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Uploader</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+</head>
+<body>
+    <main class="container">
+        <article>
+            <header>
+                <h1>📁 File Uploader</h1>
+                <p>ファイルを選択してアップロードしてください</p>
+            </header>
+
+            <form id="uploadForm">
+                <input type="file" id="fileInput" name="file" required>
+                <button type="submit">アップロード</button>
+            </form>
+
+            <dialog id="resultDialog">
+                <article>
+                    <header>
+                        <button aria-label="Close" rel="prev" onclick="closeDialog()"></button>
+                        <h3 id="dialogTitle">結果</h3>
+                    </header>
+                    <p id="dialogMessage"></p>
+                    <footer>
+                        <button onclick="closeDialog()">閉じる</button>
+                    </footer>
+                </article>
+            </dialog>
+        </article>
+    </main>
+
+    <script>
+        const form = document.getElementById('uploadForm');
+        const dialog = document.getElementById('resultDialog');
+        const dialogTitle = document.getElementById('dialogTitle');
+        const dialogMessage = document.getElementById('dialogMessage');
+        const submitButton = form.querySelector('button[type="submit"]');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const fileInput = document.getElementById('fileInput');
+            const files = fileInput.files;
+
+            if (files.length === 0) {
+                showDialog('エラー', 'ファイルを選択してください');
+                return;
+            }
+
+            submitButton.disabled = true;
+            submitButton.setAttribute('aria-busy', 'true');
+            submitButton.textContent = 'アップロード中...';
+
+            try {
+                const formData = new FormData(form);
+                const response = await fetch(window.location.href, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.result === 'done') {
+                    showDialog('✅ 成功', 'ファイルをアップロードしました');
+                    form.reset();
+                } else {
+                    showDialog('❌ エラー', result.error || 'アップロードに失敗しました');
+                }
+            } catch (error) {
+                showDialog('❌ エラー', 'アップロード中にエラーが発生しました: ' + error.message);
+            } finally {
+                submitButton.disabled = false;
+                submitButton.removeAttribute('aria-busy');
+                submitButton.textContent = 'アップロード';
+            }
+        });
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        function showDialog(title, message) {
+            dialogTitle.textContent = title;
+            dialogMessage.textContent = message;
+            dialogMessage.style.whiteSpace = 'pre-line';
+            dialog.showModal();
+        }
+
+        function closeDialog() {
+            dialog.close();
+        }
+    </script>
+</body>
+</html>

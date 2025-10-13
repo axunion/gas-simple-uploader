@@ -3,7 +3,7 @@
 	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
-		"build": "tsc && cp src/appsscript.json dist/appsscript.json",
+		"build": "tsc && cp src/appsscript.json dist/appsscript.json && cp src/index.html dist/index.html",
 		"format": "biome format ./src",
 		"format:write": "biome format --write ./src",
 		"lint": "biome lint ./src",
