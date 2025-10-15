@@ -26,9 +26,9 @@
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 1.25rem;
-            padding: 2rem;
+            padding: 1.5rem;
             box-shadow: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.1);
-            max-width: 25rem;
+            max-width: 32rem;
             width: 90%;
             text-align: center;
         }
@@ -36,7 +36,7 @@
         h1 {
             font-size: 1.75rem;
             background: linear-gradient(135deg, #667eea, #764ba2);
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -68,62 +68,58 @@
 
         .upload-icon {
             font-size: 2rem;
-            margin-bottom: 0.625rem;
+            margin-bottom: 0.5rem;
             color: #667eea;
         }
 
         .upload-text {
-            font-size: 0.875rem;
             color: #666;
-            margin-bottom: 0.5rem;
         }
 
         .upload-hint {
             font-size: 0.75rem;
             color: #999;
+            margin-top: 0.5rem;
         }
 
         .selected-file {
-            background: rgba(102, 126, 234, 0.2);
+            background: rgba(102, 126, 234, 0.1);
             padding: 2rem 1rem;
-            border-radius: 0.625rem;
+            border-radius: 0.5rem;
             display: none;
-        }
-
-        .file-info {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.625rem;
+            text-align: center;
         }
 
         .file-name {
             font-weight: 600;
             color: #333;
-            font-size: 0.875rem;
         }
 
         .file-size {
             color: #666;
             font-size: 0.75rem;
+            margin-top: 0.25rem;
         }
 
         .btn {
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             border: none;
-            margin-top: 1.5rem;
+            margin-top: 1rem;
             padding: 1rem;
-            border-radius: 1.25rem;
-            font-size: 0.875rem;
+            border-radius: 0.5rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: 0.3s ease;
             width: 100%;
+            display: none;
+        }
+
+        .btn.show {
+            display: block;
         }
 
         .btn:hover {
-            transform: translateY(-0.125rem);
             box-shadow: 0 0.625rem 1.25rem rgba(102, 126, 234, 0.3);
         }
 
@@ -177,9 +173,9 @@
 
         .dialog-content {
             background: white;
-            border-radius: 0.9375rem;
+            border-radius: 1rem;
             padding: 1.5rem;
-            max-width: 22rem;
+            max-width: 24rem;
             width: 85%;
             text-align: center;
             box-shadow: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.2);
@@ -195,7 +191,6 @@
             color: #666;
             margin-bottom: 1.5rem;
             line-height: 1.5;
-            font-size: 0.875rem;
         }
 
         .dialog-close {
@@ -203,10 +198,9 @@
             color: #333;
             border: none;
             padding: 0.625rem 1.5rem;
-            border-radius: 1.5625rem;
+            border-radius: 1.5rem;
             cursor: pointer;
             transition: background 0.3s ease;
-            font-size: 0.875rem;
         }
 
         .dialog-close:hover {
@@ -216,7 +210,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>📁 File Upload</h1>
+        <h1>📁 Upload</h1>
 
         <form id="uploadForm">
             <div class="upload-area" id="uploadArea">
@@ -228,15 +222,11 @@
             <input type="file" id="fileInput" name="file" class="file-input" required>
 
             <div class="selected-file" id="selectedFile">
-                <div class="file-info">
-                    <div>
-                        <div class="file-name" id="fileName"></div>
-                        <div class="file-size" id="fileSize"></div>
-                    </div>
-                </div>
+                <div class="file-name" id="fileName"></div>
+                <div class="file-size" id="fileSize"></div>
             </div>
 
-            <button type="submit" class="btn" id="uploadBtn">アップロード</button>
+            <button type="submit" class="btn" id="uploadBtn">送信</button>
         </form>
     </div>
 
@@ -244,123 +234,133 @@
         <div class="dialog-content">
             <div class="dialog-title" id="dialogTitle">結果</div>
             <div class="dialog-message" id="dialogMessage"></div>
-            <button class="dialog-close" onclick="closeDialog()">閉じる</button>
+            <button class="dialog-close" id="dialogCloseBtn">閉じる</button>
         </div>
     </div>
 
     <script>
-        const form = document.getElementById('uploadForm');
-        const dialog = document.getElementById('resultDialog');
-        const dialogTitle = document.getElementById('dialogTitle');
-        const dialogMessage = document.getElementById('dialogMessage');
-        const submitButton = document.getElementById('uploadBtn');
-        const fileInput = document.getElementById('fileInput');
-        const uploadArea = document.getElementById('uploadArea');
-        const selectedFile = document.getElementById('selectedFile');
-        const fileName = document.getElementById('fileName');
-        const fileSize = document.getElementById('fileSize');
+        const elements = {
+            form: document.getElementById('uploadForm'),
+            fileInput: document.getElementById('fileInput'),
+            uploadArea: document.getElementById('uploadArea'),
+            selectedFile: document.getElementById('selectedFile'),
+            fileName: document.getElementById('fileName'),
+            fileSize: document.getElementById('fileSize'),
+            submitButton: document.getElementById('uploadBtn'),
+            dialog: document.getElementById('resultDialog'),
+            dialogTitle: document.getElementById('dialogTitle'),
+            dialogMessage: document.getElementById('dialogMessage'),
+            dialogCloseBtn: document.getElementById('dialogCloseBtn')
+        };
 
-        uploadArea.addEventListener('click', () => {
-            fileInput.click();
-        });
+        const formatFileSize = (bytes) => {
+            if (bytes < 1024) return `${bytes} B`;
+            if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+            return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+        };
 
-        uploadArea.addEventListener('dragover', (e) => {
+        const displaySelectedFile = (file) => {
+            elements.fileName.textContent = file.name;
+            elements.fileSize.textContent = formatFileSize(file.size);
+            elements.selectedFile.style.display = 'block';
+            elements.uploadArea.style.display = 'none';
+            elements.submitButton.classList.add('show');
+        };
+
+        const resetFileDisplay = () => {
+            elements.selectedFile.style.display = 'none';
+            elements.uploadArea.style.display = 'block';
+            elements.fileInput.value = '';
+            elements.submitButton.classList.remove('show');
+        };
+
+        const setButtonLoading = (loading) => {
+            elements.submitButton.disabled = loading;
+            elements.submitButton.classList.toggle('loading', loading);
+        };
+
+        const showDialog = (title, message) => {
+            elements.dialogTitle.textContent = title;
+            elements.dialogMessage.textContent = message;
+            elements.dialog.classList.add('show');
+        };
+
+        const closeDialog = () => {
+            elements.dialog.classList.remove('show');
+        };
+
+        const uploadFileToServer = (file) => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+
+                reader.onload = (e) => {
+                    const base64Data = e.target.result.split(',')[1];
+
+                    google.script.run
+                        .withSuccessHandler(resolve)
+                        .withFailureHandler(reject)
+                        .uploadFile(base64Data, file.name, file.type);
+                };
+
+                reader.onerror = () => reject(new Error('ファイルの読み込みに失敗しました'));
+                reader.readAsDataURL(file);
+            });
+        };
+
+        const handleSubmit = async (e) => {
             e.preventDefault();
-            uploadArea.classList.add('dragover');
-        });
 
-        uploadArea.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('dragover');
-        });
-
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('dragover');
-
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                fileInput.files = files;
-                displaySelectedFile(files[0]);
-            }
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            const files = e.target.files;
-            if (files.length > 0) {
-                displaySelectedFile(files[0]);
-            }
-        });
-
-        function displaySelectedFile(file) {
-            fileName.textContent = file.name;
-            fileSize.textContent = formatFileSize(file.size);
-            selectedFile.style.display = 'block';
-            uploadArea.style.display = 'none';
-        }
-
-        function resetFileDisplay() {
-            selectedFile.style.display = 'none';
-            uploadArea.style.display = 'block';
-            fileInput.value = '';
-        }
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const files = fileInput.files;
-
-            if (files.length === 0) {
-                showDialog('❌ エラー', 'ファイルを選択してください');
+            const file = elements.fileInput.files[0];
+            if (!file) {
+                showDialog('エラー', 'ファイルを選択してください');
                 return;
             }
 
-            submitButton.disabled = true;
-            submitButton.classList.add('loading');
+            setButtonLoading(true);
 
             try {
-                const formData = new FormData(form);
-                const response = await fetch(window.location.href, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const result = await response.json();
+                const result = await uploadFileToServer(file);
 
                 if (result.result === 'done') {
-                    showDialog('✅ 成功', 'ファイルをアップロードしました');
+                    showDialog('成功', 'ファイルをアップロードしました');
                     resetFileDisplay();
                 } else {
-                    showDialog('❌ エラー', result.error || 'アップロードに失敗しました');
+                    showDialog('エラー', 'アップロードに失敗しました');
                 }
             } catch (error) {
-                showDialog('❌ エラー', 'アップロード中にエラーが発生しました: ' + error.message);
+                showDialog('エラー', `アップロード中にエラーが発生しました: ${error.message}`);
             } finally {
-                submitButton.disabled = false;
-                submitButton.classList.remove('loading');
+                setButtonLoading(false);
+            }
+        };
+
+
+        elements.uploadArea.addEventListener('click', () => elements.fileInput.click());
+
+        ['dragover', 'dragleave', 'drop'].forEach(eventName => {
+            elements.uploadArea.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                elements.uploadArea.classList.toggle('dragover', eventName === 'dragover');
+
+                if (eventName === 'drop' && e.dataTransfer.files.length > 0) {
+                    elements.fileInput.files = e.dataTransfer.files;
+                    displaySelectedFile(e.dataTransfer.files[0]);
+                }
+            });
+        });
+
+        elements.fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                displaySelectedFile(e.target.files[0]);
             }
         });
 
-        function formatFileSize(bytes) {
-            if (bytes < 1024) return bytes + ' B';
-            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-        }
+        elements.form.addEventListener('submit', handleSubmit);
 
-        function showDialog(title, message) {
-            dialogTitle.textContent = title;
-            dialogMessage.textContent = message;
-            dialog.classList.add('show');
-        }
+        elements.dialogCloseBtn.addEventListener('click', closeDialog);
 
-        function closeDialog() {
-            dialog.classList.remove('show');
-        }
-
-        dialog.addEventListener('click', (e) => {
-            if (e.target === dialog) {
-                closeDialog();
-            }
+        elements.dialog.addEventListener('click', (e) => {
+            if (e.target === elements.dialog) closeDialog();
         });
     </script>
 </body>
