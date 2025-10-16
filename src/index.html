@@ -13,104 +13,119 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #8b9dc3 0%, #9bb5d1 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg,
+                rgba(120, 119, 198, 0.85) 0%,
+                rgba(138, 180, 248, 0.8) 50%,
+                rgba(255, 154, 158, 0.75) 100%);
             min-height: 100vh;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #333;
+            flex-direction: column;
+            color: #1d1d1f;
+            position: relative;
         }
 
-        .container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 1.25rem;
-            padding: 1.5rem;
-            box-shadow: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.1);
-            max-width: 32rem;
-            width: 90%;
+        header, main {
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            padding: 2rem 0 0;
             text-align: center;
         }
 
-        h1 {
-            font-size: 1.75rem;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            margin-bottom: 1rem;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        header h1 {
+            font-size: 1.5rem;
+            color: #ffffff;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1rem 9rem;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 18px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08),
+                        0 1px 2px rgba(0, 0, 0, 0.06);
+            max-width: 28rem;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
         .upload-area {
-            border: 2px dashed #ddd;
-            border-radius: 1.25rem;
-            padding: 2rem 1rem;
-            background: rgba(249, 250, 251, 0.8);
-            transition: all 0.3s ease;
+            border: 2px dashed #c7c7cc;
+            border-radius: 12px;
+            padding: 3rem 1.5rem;
+            background: rgba(248, 248, 248, 0.5);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
         }
 
         .upload-area:hover {
-            border-color: #667eea;
-            background: rgba(102, 126, 234, 0.05);
+            border-color: #007aff;
+            background: rgba(0, 122, 255, 0.04);
         }
 
         .upload-area.dragover {
-            border-color: #667eea;
-            background: rgba(102, 126, 234, 0.1);
-            transform: scale(1.02);
-        }
-
-        .file-input {
-            display: none;
+            border-color: #007aff;
+            background: rgba(0, 122, 255, 0.08);
+            transform: scale(1.01);
         }
 
         .upload-icon {
             font-size: 2rem;
-            margin-bottom: 0.5rem;
-            color: #667eea;
+            margin-bottom: 1rem;
         }
 
         .upload-text {
-            color: #666;
+            color: #1d1d1f;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
         }
 
         .upload-hint {
-            font-size: 0.75rem;
-            color: #999;
-            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: #86868b;
         }
 
         .selected-file {
-            background: rgba(102, 126, 234, 0.1);
-            padding: 2rem 1rem;
-            border-radius: 0.5rem;
+            background: rgba(0, 122, 255, 0.08);
+            padding: 2rem 1.5rem;
+            border-radius: 12px;
             display: none;
-            text-align: center;
         }
 
         .file-name {
-            font-weight: 600;
-            color: #333;
+            font-weight: 500;
+            color: #1d1d1f;
+            font-size: 1rem;
+            word-break: break-word;
         }
 
         .file-size {
-            color: #666;
-            font-size: 0.75rem;
-            margin-top: 0.25rem;
+            color: #86868b;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
         }
 
         .btn {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
+            background: #007aff;
+            color: #ffffff;
             border: none;
             margin-top: 1rem;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
+            padding: 0.875rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 500;
             cursor: pointer;
-            transition: 0.3s ease;
+            transition: all 0.2s ease;
             width: 100%;
             display: none;
         }
@@ -119,15 +134,19 @@
             display: block;
         }
 
-        .btn:hover {
-            box-shadow: 0 0.625rem 1.25rem rgba(102, 126, 234, 0.3);
+        .btn:hover:not(:disabled) {
+            background: #0051d5;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+        }
+
+        .btn:active:not(:disabled) {
+            transform: translateY(0);
         }
 
         .btn:disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
         }
 
         .btn.loading {
@@ -142,29 +161,24 @@
             height: 1.25rem;
             top: 50%;
             left: 50%;
-            margin-left: -0.625rem;
-            margin-top: -0.625rem;
-            border: 2px solid #ffffff;
+            margin: -0.625rem 0 0 -0.625rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
-            border-top-color: transparent;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+            border-top-color: #ffffff;
+            animation: spin 0.8s linear infinite;
         }
 
         .dialog {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 1000;
+            animation: fadeIn 0.2s ease;
         }
 
         .dialog.show {
@@ -172,91 +186,136 @@
         }
 
         .dialog-content {
-            background: white;
-            border-radius: 1rem;
-            padding: 1.5rem;
-            max-width: 24rem;
-            width: 85%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 14px;
+            padding: 2rem;
+            max-width: 22rem;
+            width: 88%;
             text-align: center;
-            box-shadow: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.2);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         .dialog-title {
-            font-size: 1.125rem;
+            font-size: 1.25rem;
+            font-weight: 600;
             margin-bottom: 0.75rem;
-            color: #333;
+            color: #1d1d1f;
+            letter-spacing: -0.02em;
         }
 
         .dialog-message {
-            color: #666;
+            color: #1d1d1f;
+            font-size: 0.9375rem;
             margin-bottom: 1.5rem;
             line-height: 1.5;
         }
 
         .dialog-close {
-            background: #f1f3f4;
-            color: #333;
+            background: #007aff;
+            color: #ffffff;
             border: none;
-            padding: 0.625rem 1.5rem;
-            border-radius: 1.5rem;
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 500;
             cursor: pointer;
-            transition: background 0.3s ease;
+            transition: all 0.2s ease;
         }
 
         .dialog-close:hover {
-            background: #e8eaed;
+            background: #0051d5;
+            transform: translateY(-1px);
+        }
+
+        .dialog-close:active {
+            transform: translateY(0);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>📁 Upload</h1>
+    <header>
+        <h1>File Upload</h1>
+    </header>
 
-        <form id="uploadForm">
-            <div class="upload-area" id="uploadArea">
-                <div class="upload-icon">☁️</div>
-                <div class="upload-text">クリックしてファイルを選択</div>
-                <div class="upload-hint">またはファイルをドラッグ&ドロップ</div>
-            </div>
+    <main>
+        <div class="container">
+            <form id="uploadForm">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">ファイルを選択</div>
+                    <div class="upload-hint">クリックまたはドラッグ&ドロップ</div>
+                </div>
 
-            <input type="file" id="fileInput" name="file" class="file-input" required>
+                <input type="file" id="fileInput" class="file-input" required>
 
-            <div class="selected-file" id="selectedFile">
-                <div class="file-name" id="fileName"></div>
-                <div class="file-size" id="fileSize"></div>
-            </div>
+                <div class="selected-file" id="selectedFile">
+                    <div class="file-name" id="fileName"></div>
+                    <div class="file-size" id="fileSize"></div>
+                </div>
 
-            <button type="submit" class="btn" id="uploadBtn">送信</button>
-        </form>
-    </div>
+                <button type="submit" class="btn" id="uploadBtn">アップロード</button>
+            </form>
+        </div>
+    </main>
 
     <div class="dialog" id="resultDialog">
         <div class="dialog-content">
-            <div class="dialog-title" id="dialogTitle">結果</div>
+            <div class="dialog-title" id="dialogTitle"></div>
             <div class="dialog-message" id="dialogMessage"></div>
-            <button class="dialog-close" id="dialogCloseBtn">閉じる</button>
+            <button class="dialog-close" id="dialogCloseBtn">OK</button>
         </div>
     </div>
 
     <script>
+        const $ = (id) => document.getElementById(id);
+
         const elements = {
-            form: document.getElementById('uploadForm'),
-            fileInput: document.getElementById('fileInput'),
-            uploadArea: document.getElementById('uploadArea'),
-            selectedFile: document.getElementById('selectedFile'),
-            fileName: document.getElementById('fileName'),
-            fileSize: document.getElementById('fileSize'),
-            submitButton: document.getElementById('uploadBtn'),
-            dialog: document.getElementById('resultDialog'),
-            dialogTitle: document.getElementById('dialogTitle'),
-            dialogMessage: document.getElementById('dialogMessage'),
-            dialogCloseBtn: document.getElementById('dialogCloseBtn')
+            form: $('uploadForm'),
+            fileInput: $('fileInput'),
+            uploadArea: $('uploadArea'),
+            selectedFile: $('selectedFile'),
+            fileName: $('fileName'),
+            fileSize: $('fileSize'),
+            submitButton: $('uploadBtn'),
+            dialog: $('resultDialog'),
+            dialogTitle: $('dialogTitle'),
+            dialogMessage: $('dialogMessage'),
+            dialogCloseBtn: $('dialogCloseBtn')
         };
 
         const formatFileSize = (bytes) => {
-            if (bytes < 1024) return `${bytes} B`;
-            if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-            return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return `${(bytes / Math.pow(k, i)).toFixed(1)} ${sizes[i]}`;
         };
 
         const displaySelectedFile = (file) => {
@@ -274,7 +333,7 @@
             elements.submitButton.classList.remove('show');
         };
 
-        const setButtonLoading = (loading) => {
+        const setLoading = (loading) => {
             elements.submitButton.disabled = loading;
             elements.submitButton.classList.toggle('loading', loading);
         };
@@ -289,19 +348,16 @@
             elements.dialog.classList.remove('show');
         };
 
-        const uploadFileToServer = (file) => {
+        const uploadFile = (file) => {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
-
                 reader.onload = (e) => {
                     const base64Data = e.target.result.split(',')[1];
-
                     google.script.run
                         .withSuccessHandler(resolve)
                         .withFailureHandler(reject)
                         .uploadFile(base64Data, file.name, file.type);
                 };
-
                 reader.onerror = () => reject(new Error('ファイルの読み込みに失敗しました'));
                 reader.readAsDataURL(file);
             });
@@ -309,56 +365,56 @@
 
         const handleSubmit = async (e) => {
             e.preventDefault();
-
             const file = elements.fileInput.files[0];
+
             if (!file) {
                 showDialog('エラー', 'ファイルを選択してください');
                 return;
             }
 
-            setButtonLoading(true);
+            setLoading(true);
 
             try {
-                const result = await uploadFileToServer(file);
-
+                const result = await uploadFile(file);
                 if (result.result === 'done') {
-                    showDialog('成功', 'ファイルをアップロードしました');
+                    showDialog('完了', 'ファイルのアップロードに成功しました');
                     resetFileDisplay();
                 } else {
                     showDialog('エラー', 'アップロードに失敗しました');
                 }
             } catch (error) {
-                showDialog('エラー', `アップロード中にエラーが発生しました: ${error.message}`);
+                showDialog('エラー', error.message || 'アップロード中にエラーが発生しました');
             } finally {
-                setButtonLoading(false);
+                setLoading(false);
             }
         };
 
-
+        // イベントリスナー
         elements.uploadArea.addEventListener('click', () => elements.fileInput.click());
 
-        ['dragover', 'dragleave', 'drop'].forEach(eventName => {
-            elements.uploadArea.addEventListener(eventName, (e) => {
-                e.preventDefault();
-                elements.uploadArea.classList.toggle('dragover', eventName === 'dragover');
+        elements.fileInput.addEventListener('change', (e) => {
+            if (e.target.files[0]) displaySelectedFile(e.target.files[0]);
+        });
 
-                if (eventName === 'drop' && e.dataTransfer.files.length > 0) {
-                    elements.fileInput.files = e.dataTransfer.files;
-                    displaySelectedFile(e.dataTransfer.files[0]);
+        ['dragover', 'dragleave', 'drop'].forEach(type => {
+            elements.uploadArea.addEventListener(type, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (type === 'dragover') {
+                    elements.uploadArea.classList.add('dragover');
+                } else {
+                    elements.uploadArea.classList.remove('dragover');
+                    if (type === 'drop' && e.dataTransfer.files[0]) {
+                        elements.fileInput.files = e.dataTransfer.files;
+                        displaySelectedFile(e.dataTransfer.files[0]);
+                    }
                 }
             });
         });
 
-        elements.fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                displaySelectedFile(e.target.files[0]);
-            }
-        });
-
         elements.form.addEventListener('submit', handleSubmit);
-
         elements.dialogCloseBtn.addEventListener('click', closeDialog);
-
         elements.dialog.addEventListener('click', (e) => {
             if (e.target === elements.dialog) closeDialog();
         });
