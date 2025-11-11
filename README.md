@@ -21,7 +21,7 @@ dist/               # Generated build output (recommend git ignore)
 
 ### 1. Install dependencies
 ```bash
-npm install
+pnpm install
 ```
 
 ### 2. Required tools
@@ -30,7 +30,7 @@ npm install
 
 Install clasp:
 ```bash
-npm install -g @google/clasp
+pnpm install -g @google/clasp
 ```
 
 ### 3. Link a GAS project
@@ -60,7 +60,7 @@ npm install -g @google/clasp
 ### Change → Build → Push
 ```bash
 # Transpile TypeScript to dist/ & copy appsscript.json
-npm run build
+pnpm build
 
 # Upload (only dist/ content is sent)
 clasp push
@@ -111,7 +111,7 @@ Keeping build artifacts out of git avoids noisy diffs.
 ---
 Quick Summary:
 1. Edit code + `appsscript.json` in `src/`.
-2. `npm run build` → outputs to `dist/`.
+2. `pnpm build` → outputs to `dist/`.
 3. Ensure `.clasp.json` sets `rootDir: "dist"`.
 4. `clasp push` then `clasp deploy`.
 5. Use Biome scripts for quality.
