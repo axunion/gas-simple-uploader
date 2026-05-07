@@ -1,119 +1,78 @@
-# GAS TypeScript Template
+# gas-simple-uploader
 
-A minimal template for developing Google Apps Script (GAS) projects with TypeScript. You write code in `src/`, build to `dist/`, and upload only the compiled output via `clasp`.
+A Google Apps Script web app for uploading files to Google Drive, built with TypeScript and deployed via `clasp`.
 
-## 🚀 Features
-- TypeScript (target ES6, `module: none` for GAS compatibility)
-- Biome for formatting / linting / combined checks
-- Sample `doGet` / `doPost` returning JSON
-- `appsscript.json` kept in `src/` and copied to `dist/` on build
+## How It Works
 
-## 📂 Directory Layout
-```
-src/
-	doGet.ts
-	doPost.ts
-	appsscript.json   # Edit this while developing
-dist/               # Generated build output (recommend git ignore)
-```
+- `doGet` serves `index.html` as a web app
+- The frontend base64-encodes the file and calls `uploadFile`
+- `uploadFile` saves the file to the folder specified by the `UPLOAD_FOLDER_ID` script property
 
-## 🛠 Setup
+## Setup
 
 ### 1. Install dependencies
+
 ```bash
 pnpm install
 ```
 
-### 2. Required tools
-- Node.js (18+ recommended)
-- [clasp](https://github.com/google/clasp)
+### 2. Set up clasp
 
-Install clasp:
 ```bash
+# Install if needed
 pnpm install -g @google/clasp
+
+# Authenticate
+clasp login
+
+# Create a new project or connect to an existing one
+clasp create --type webapp --title "simple-uploader"
+# or
+clasp clone <SCRIPT_ID>
 ```
 
-### 3. Link a GAS project
-1. Authenticate:
-	 ```bash
-	 clasp login
-	 ```
-2. Create a new (web app) project:
-	 ```bash
-	 clasp create --type webapp --title "Your Project Name"
-	 ```
-	 Or connect to an existing project:
-	 ```bash
-	 clasp clone <SCRIPT_ID>
-	 ```
-3. Move (or keep) the generated `appsscript.json` into `src/` (remove any root copy).
-4. Ensure `.clasp.json` (at repo root) sets `rootDir` to `dist`. If missing, create:
-	 ```json
-	 {
-		 "scriptId": "<YOUR_SCRIPT_ID>",
-		 "rootDir": "dist"
-	 }
-	 ```
+Make sure `.clasp.json` has `rootDir` set to `dist`:
 
-## 🔄 Development Workflow
+```json
+{ "scriptId": "<YOUR_SCRIPT_ID>", "rootDir": "dist" }
+```
 
-### Change → Build → Push
+### 3. Set the upload folder
+
+Add a script property in the GAS editor (Project Settings → Script Properties):
+
+| Key | Value |
+|---|---|
+| `UPLOAD_FOLDER_ID` | The ID of the target Google Drive folder |
+
+## Workflow
+
 ```bash
-# Transpile TypeScript to dist/ & copy appsscript.json
+# Build (outputs to dist/)
 pnpm build
 
-# Upload (only dist/ content is sent)
+# Push to GAS
 clasp push
+
+# Deploy as web app
+clasp deploy --description "update"
 ```
 
-### Deploy as Web App
-```bash
-# Create a new deployment (first time or new version)
-clasp deploy --description "feat: initial deploy"
+## Directory Layout
 
-# Update an existing deployment (specify deploymentId)
-clasp deploy --deploymentId <DEPLOYMENT_ID> --description "update"
 ```
-After deployment you can call the web app URL with GET/POST to receive JSON.
-
-#### Example (GET)
-```bash
-curl "https://script.google.com/macros/s/<DEPLOYMENT_ID>/exec?type=sample"
+src/
+  doGet.ts          # Web app entry point
+  uploadFile.ts     # Drive upload logic
+  index.html        # Uploader UI
+  appsscript.json
+dist/               # Build output (recommend git ignore)
 ```
 
-#### Example (POST)
-```bash
-curl -X POST \
-	-H 'Content-Type: application/json' \
-	-d '{"type":"sample"}' \
-	"https://script.google.com/macros/s/<DEPLOYMENT_ID>/exec"
-```
+## Scripts
 
-## 🔧 Customization
-- Time zone: edit `timeZone` in `src/appsscript.json`
-- TypeScript config: `tsconfig.json`
-- Biome detailed rules: add a root `biome.json`
-- Change deployment root: adjust `.clasp.json` `rootDir` and the build copy step
-
-## 🗂 Recommended `.gitignore`
-```
-dist/
-node_modules/
-```
-Keeping build artifacts out of git avoids noisy diffs.
-
-## 📚 References
-- [Google Apps Script Docs](https://developers.google.com/apps-script)
-- [clasp Docs](https://github.com/google/clasp)
-- [TypeScript](https://www.typescriptlang.org/)
-- [Biome](https://biomejs.dev/)
-
----
-Quick Summary:
-1. Edit code + `appsscript.json` in `src/`.
-2. `pnpm build` → outputs to `dist/`.
-3. Ensure `.clasp.json` sets `rootDir: "dist"`.
-4. `clasp push` then `clasp deploy`.
-5. Use Biome scripts for quality.
-
-Happy coding! 🚀
+| Command | Description |
+|---|---|
+| `pnpm build` | Compile TypeScript to `dist/` |
+| `pnpm check` | Lint and format check with Biome |
+| `pnpm fix` | Auto-fix with Biome |
