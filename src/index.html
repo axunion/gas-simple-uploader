@@ -3,466 +3,562 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#667eea">
+    <meta name="theme-color" content="#F4F1EA">
     <title>File Upload</title>
     <style>
-        * {
+        *, *::before, *::after {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
 
+        button, input {
+            border-radius: 0;
+            outline: none;
+        }
+
+        :root {
+            --font-sans:  -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+                          "Helvetica Neue", "Helvetica", "Segoe UI Variable", "Segoe UI",
+                          system-ui, "Liberation Sans", "Arial", sans-serif;
+            --font-serif: ui-serif, "New York", "Iowan Old Style",
+                          "Palatino Linotype", Palatino, Georgia, serif;
+            --font-mono:  ui-monospace, "SF Mono", "Menlo", "Monaco",
+                         "Cascadia Mono", "Consolas", "Liberation Mono", monospace;
+
+            --bg:              #F4F1EA;
+            --surface:         #FAF8F2;
+            --ink:             #131310;
+            --ink-muted:       #6E6B62;
+            --ink-faint:       #B5B0A4;
+            --hairline:        rgba(19, 19, 16, 0.12);
+            --hairline-strong: rgba(19, 19, 16, 0.24);
+            --accent:          #C2410C;
+
+            --ease:    cubic-bezier(0.2, 0, 0, 1);
+            --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
+            --dur-1:   140ms;
+            --dur-2:   240ms;
+            --dur-3:   420ms;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            font-family: var(--font-sans);
+            font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "ss01" 1;
+            font-variant-numeric: lining-nums;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+            color: var(--ink);
+            background-color: var(--bg);
+            background-image: radial-gradient(
+                circle at 1px 1px,
+                rgba(19, 19, 16, 0.07) 1px,
+                transparent 0
+            );
+            background-size: 24px 24px;
             min-height: 100dvh;
+            padding: clamp(20px, 4vw, 56px);
+            padding-bottom: calc(clamp(20px, 4vw, 56px) + env(safe-area-inset-bottom));
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 1.5rem;
-            padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
         }
 
-        .card {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 2rem;
+        main {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(20px, 3vw, 36px);
+            max-width: 1080px;
             width: 100%;
-            max-width: 380px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
 
-        .title {
-            font-size: 1.375rem;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 1.5rem;
-            letter-spacing: -0.025em;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        /* ── DISPLAY TITLE ── */
+
+        .display {
+            font-family: var(--font-serif);
+            font-size: clamp(26px, 8.5vw, 88px);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 0.95;
+            color: var(--ink);
+            white-space: nowrap;
+            animation: rise 520ms 60ms var(--ease) both;
         }
+
+        /* ── HAIRLINE RULE ── */
+
+        .rule {
+            border: 0;
+            border-top: 1px solid var(--hairline);
+            animation: rise 480ms 120ms var(--ease) both;
+        }
+
+        /* ── FORM ── */
+
+        #uploadForm {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(14px, 2vw, 22px);
+        }
+
+        /* ── DROPZONE WRAP ── */
+
+        .dropzone-wrap {
+            width: min(720px, 100%);
+            animation: rise 540ms 180ms var(--ease) both;
+        }
+
+        /* ── DROPZONE ── */
 
         .dropzone {
-            border: 2px dashed rgba(255, 255, 255, 0.4);
-            border-radius: 16px;
-            padding: 2.5rem 1.5rem;
-            text-align: center;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: clamp(28px, 5vw, 48px) clamp(20px, 4vw, 36px);
+            min-height: clamp(160px, 24vw, 220px);
+            border: 1px solid var(--hairline);
             cursor: pointer;
-            transition: all 0.2s;
-            background: rgba(255, 255, 255, 0.1);
+            transition: border-color var(--dur-2) var(--ease),
+                        background-color var(--dur-2) var(--ease);
+            outline: none;
         }
 
-        .dropzone:hover, .dropzone.active {
-            border-color: rgba(255, 255, 255, 0.7);
-            background: rgba(255, 255, 255, 0.2);
+        .dropzone:hover {
+            border-color: var(--hairline-strong);
+            background: var(--surface);
         }
 
-        .dropzone-icon {
-            width: 52px;
-            height: 52px;
-            margin: 0 auto 1rem;
-            background: rgba(255, 255, 255, 0.25);
-            border-radius: 14px;
+        .dropzone.active {
+            border-color: var(--accent);
+            background: var(--surface);
+        }
+
+        .dropzone:focus-visible {
+            outline: 1px solid var(--accent);
+            outline-offset: 3px;
+        }
+
+        .plus {
+            font-size: 28px;
+            font-weight: 300;
+            line-height: 1;
+            color: var(--ink);
+            flex-shrink: 0;
+            user-select: none;
+            transition: color var(--dur-2) var(--ease),
+                        transform var(--dur-2) var(--ease);
+        }
+
+        .dropzone:hover .plus,
+        .dropzone.active .plus {
+            color: var(--accent);
+            transform: rotate(90deg);
+        }
+
+        .dz-text {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            flex-direction: column;
+            gap: 4px;
         }
 
-        .dropzone-icon svg {
-            width: 26px;
-            height: 26px;
-            stroke: #fff;
-            stroke-width: 2;
-            fill: none;
+        .dz-primary {
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: -0.005em;
+            line-height: 1.3;
+            color: var(--ink);
         }
 
-        .dropzone-text {
-            font-size: 0.9375rem;
-            font-weight: 600;
-            color: #fff;
-            margin-bottom: 0.25rem;
+        .dz-hint {
+            font-size: 13px;
+            font-weight: 400;
+            line-height: 1.45;
+            color: var(--ink-muted);
         }
 
-        .dropzone-hint {
-            font-size: 0.8125rem;
-            color: rgba(255, 255, 255, 0.7);
-        }
+        /* ── FILE ROW ── */
 
-        .file-card {
+        .file-row {
             display: none;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 14px;
-            padding: 1rem;
-            gap: 0.875rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            align-items: baseline;
+            gap: 24px;
+            padding: 18px 0;
+            border-top: 1px solid var(--hairline);
+            border-bottom: 1px solid var(--hairline);
         }
 
-        .file-card.show {
-            display: flex;
-            align-items: center;
-            animation: fadeIn 0.25s ease;
+        .file-row.show {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto auto;
+            animation: fadeIn var(--dur-2) var(--ease);
         }
 
-        .file-card-icon {
-            width: 42px;
-            height: 42px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
+        .filename {
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: -0.005em;
+            line-height: 1.3;
+            color: var(--ink);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+        }
+
+        .filesize {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+            line-height: 1;
+            color: var(--ink-muted);
+            font-feature-settings: "tnum" 1;
+            font-variant-numeric: tabular-nums lining-nums;
+            white-space: nowrap;
+        }
+
+        .remove {
+            appearance: none;
+            background: transparent;
+            border: 0;
+            font: inherit;
+            font-size: 14px;
+            line-height: 1;
+            color: var(--ink-muted);
+            cursor: pointer;
+            padding: 4px 0 4px 8px;
+            transition: color var(--dur-1) var(--ease);
+        }
+
+        .remove:hover { color: var(--accent); }
+
+        .remove:focus-visible {
+            color: var(--accent);
+            outline: 1px solid var(--accent);
+            outline-offset: 3px;
+        }
+
+        /* ── FILE INPUT ── */
+
+        .file-input { display: none; }
+
+        /* ── PROGRESS ── */
+
+        .progress {
+            display: none;
+            position: relative;
+            height: 1px;
+            width: min(720px, 100%);
+        }
+
+        .progress.show { display: block; }
+
+        .progress-track {
+            position: absolute;
+            inset: 0;
+            background: var(--hairline);
+        }
+
+        .progress-bar {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 30%;
+            background: var(--accent);
+            animation: sweep 1.6s var(--ease-io) infinite;
+        }
+
+        /* ── META STRIP ── */
+
+        .meta-strip {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            line-height: 1;
+            color: var(--ink-faint);
+            text-transform: uppercase;
+            font-feature-settings: "tnum" 1;
+            width: min(720px, 100%);
+            animation: rise 480ms 240ms var(--ease) both;
+        }
+
+        /* ── SUBMIT ROW ── */
+
+        .submit-row {
+            display: flex;
+            justify-content: flex-end;
+            width: min(720px, 100%);
+            animation: rise 480ms 300ms var(--ease) both;
+        }
+
+        .submit {
+            appearance: none;
+            background: transparent;
+            border: 0;
+            font-family: var(--font-sans);
+            font-size: 17px;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+            line-height: 1;
+            color: var(--ink-muted);
+            cursor: not-allowed;
+            display: inline-flex;
+            align-items: center;
+            gap: 16px;
+            padding: 8px 0;
+            pointer-events: none;
+            transition: color var(--dur-2) var(--ease);
+        }
+
+        .submit.show {
+            pointer-events: auto;
+            cursor: pointer;
+            color: var(--ink);
+        }
+
+        .submit.show:hover,
+        .submit.show:focus-visible {
+            color: var(--accent);
+        }
+
+        .submit:focus-visible {
+            outline: 1px solid var(--accent);
+            outline-offset: 6px;
+        }
+
+        .submit.loading {
+            color: var(--ink-muted);
+            pointer-events: none;
+        }
+
+        .submit-rule {
+            display: inline-block;
+            width: 56px;
+            height: 1px;
+            background: currentColor;
+            flex-shrink: 0;
+            transition: width var(--dur-2) var(--ease);
+        }
+
+        .submit.show:hover .submit-rule,
+        .submit.show:focus-visible .submit-rule {
+            width: 88px;
+        }
+
+        .submit-arrow {
+            transition: transform var(--dur-2) var(--ease),
+                        opacity var(--dur-1) var(--ease);
+        }
+
+        .submit.show:hover .submit-arrow,
+        .submit.show:focus-visible .submit-arrow {
+            transform: translateX(4px);
+        }
+
+        .submit.loading .submit-arrow { opacity: 0; }
+
+        /* ── NOTICE BANNER ── */
+
+        .notice {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--ink);
+            transform: translateY(-100%);
+            transition: transform var(--dur-3) var(--ease);
+            z-index: 100;
+        }
+
+        .notice.show { transform: translateY(0); }
+
+        .notice-inner {
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 20px;
+            padding: 14px clamp(20px, 4vw, 56px);
+        }
+
+        .notice-tag {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--bg);
+            border: 1px solid var(--bg);
+            padding: 3px 8px;
+            line-height: 1.4;
+            white-space: nowrap;
             flex-shrink: 0;
         }
 
-        .file-card-icon svg {
-            width: 20px;
-            height: 20px;
-            stroke: #fff;
-            stroke-width: 2;
-            fill: none;
-        }
+        .notice.error .notice-tag   { color: #FFB4B4; border-color: #FFB4B4; }
+        .notice.warning .notice-tag { color: #FFD08A; border-color: #FFD08A; }
 
-        .file-card-info {
+        .notice-msg {
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--bg);
+            line-height: 1.45;
             flex: 1;
             min-width: 0;
         }
 
-        .file-card-name {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #fff;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .file-card-size {
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.7);
-            margin-top: 2px;
-        }
-
-        .file-card-remove {
-            width: 32px;
-            height: 32px;
-            border: none;
+        .notice-close {
+            appearance: none;
             background: transparent;
-            border-radius: 8px;
+            border: 0;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--bg);
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.15s;
+            padding: 4px 8px;
+            text-decoration: underline;
+            text-underline-offset: 4px;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
-        .file-card-remove:hover {
-            background: rgba(255, 255, 255, 0.15);
+        .notice-close:hover { text-decoration-thickness: 2px; }
+
+        .notice-close:focus-visible {
+            text-decoration-thickness: 2px;
+            outline: 1px solid var(--bg);
+            outline-offset: 3px;
         }
 
-        .file-card-remove svg {
-            width: 18px;
-            height: 18px;
-            stroke: rgba(255, 255, 255, 0.8);
-            stroke-width: 2;
+        /* ── KEYFRAMES ── */
+
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(6px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
-
-        .progress {
-            margin-top: 0.75rem;
-            display: none;
-        }
-
-        .progress.show {
-            display: block;
-        }
-
-        .progress-bar {
-            height: 4px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: rgba(255, 255, 255, 0.8);
-            width: 0;
-            animation: loading 1.8s ease-in-out infinite;
-        }
-
-        .btn {
-            display: none;
-            width: 100%;
-            padding: 0.9375rem;
-            border: none;
-            border-radius: 14px;
-            font-size: 0.9375rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-top: 1rem;
-        }
-
-        .btn.show {
-            display: block;
-        }
-
-        .btn-primary {
-            background: rgba(255, 255, 255, 0.9);
-            color: #764ba2;
-            position: relative;
-        }
-
-        .btn-primary:hover:not(:disabled) {
-            background: #fff;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .btn-primary:active:not(:disabled) {
-            transform: translateY(0);
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .btn-primary.loading {
-            pointer-events: none;
-        }
-
-        .btn-primary.loading .btn-label {
-            visibility: hidden;
-        }
-
-        .btn-primary.loading::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            top: 50%;
-            left: 50%;
-            margin: -10px 0 0 -10px;
-            border: 2px solid rgba(118, 75, 162, 0.3);
-            border-top-color: #764ba2;
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-        }
-
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-            z-index: 100;
-        }
-
-        .modal-overlay.show {
-            display: flex;
-            animation: fadeIn 0.2s ease;
-        }
-
-        .modal {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 2rem;
-            width: 100%;
-            max-width: 300px;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-            animation: modalIn 0.25s cubic-bezier(0.34, 1.4, 0.64, 1);
-        }
-
-        .modal-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            margin: 0 auto 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-icon.success { background: linear-gradient(135deg, #d1fae5, #a7f3d0); }
-        .modal-icon.error { background: linear-gradient(135deg, #fee2e2, #fecaca); }
-        .modal-icon.warning { background: linear-gradient(135deg, #fef3c7, #fde68a); }
-
-        .modal-icon svg {
-            width: 28px;
-            height: 28px;
-            stroke-width: 2.5;
-            fill: none;
-        }
-
-        .modal-icon.success svg { stroke: #059669; }
-        .modal-icon.error svg { stroke: #dc2626; }
-        .modal-icon.warning svg { stroke: #d97706; }
-
-        .modal-title {
-            font-size: 1.125rem;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 0.375rem;
-        }
-
-        .modal-message {
-            font-size: 0.875rem;
-            color: #64748b;
-            line-height: 1.5;
-            margin-bottom: 1.5rem;
-        }
-
-        .modal-btn {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: #fff;
-            border: none;
-            padding: 0.75rem 2rem;
-            border-radius: 12px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .modal-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        }
-
-        .file-input { display: none; }
 
         @keyframes fadeIn {
             from { opacity: 0; }
-            to { opacity: 1; }
+            to   { opacity: 1; }
         }
 
-        @keyframes modalIn {
-            from { opacity: 0; transform: scale(0.92) translateY(8px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
+        @keyframes sweep {
+            0%   { left: -30%; width: 30%; }
+            50%  { left:  35%; width: 40%; }
+            100% { left: 100%; width: 20%; }
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        /* ── REDUCED MOTION ── */
+
+        @media (prefers-reduced-motion: reduce) {
+            .display,
+            .rule,
+            .dropzone-wrap,
+            .meta-strip,
+            .submit-row,
+            .file-row.show {
+                animation: none;
+            }
+            .dropzone,
+            .plus,
+            .remove,
+            .submit,
+            .submit-rule,
+            .submit-arrow,
+            .notice {
+                transition: none;
+            }
+            .progress-bar {
+                animation: none;
+                left: 0;
+                width: 100%;
+                opacity: 0.5;
+            }
         }
 
-        @keyframes loading {
-            0% { width: 0; margin-left: 0; }
-            50% { width: 70%; margin-left: 15%; }
-            100% { width: 0; margin-left: 100%; }
-        }
-
-        @media (max-width: 400px) {
-            body { padding: 1rem; }
-            .card { padding: 1.5rem; border-radius: 16px; }
-            .dropzone { padding: 2rem 1rem; }
-        }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1 class="title">ファイルをアップロード</h1>
+    <main>
+        <h1 class="display">UPLOAD</h1>
+        <hr class="rule">
 
         <form id="uploadForm">
-            <div class="dropzone" id="dropzone">
-                <div class="dropzone-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="17 8 12 3 7 8"/>
-                        <line x1="12" y1="3" x2="12" y2="15"/>
-                    </svg>
+            <div class="dropzone-wrap">
+                <div class="dropzone" id="dropzone" tabindex="0" role="button"
+                     aria-label="ファイルを選択またはドラッグ＆ドロップ">
+                    <span class="plus" aria-hidden="true">＋</span>
+                    <div class="dz-text">
+                        <span class="dz-primary">ファイルを選択</span>
+                        <span class="dz-hint">またはドラッグ＆ドロップ</span>
+                    </div>
                 </div>
-                <div class="dropzone-text">ファイルを選択</div>
-                <div class="dropzone-hint">またはドラッグ&ドロップ</div>
+
+                <div class="file-row" id="fileCard">
+                    <span class="filename" id="fileName"></span>
+                    <span class="filesize" id="fileSize"></span>
+                    <button type="button" class="remove" id="removeBtn"
+                            aria-label="ファイルを取り消す">✕</button>
+                </div>
             </div>
 
             <input type="file" id="fileInput" class="file-input" required>
 
-            <div class="file-card" id="fileCard">
-                <div class="file-card-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                        <polyline points="14 2 14 8 20 8"/>
-                    </svg>
-                </div>
-                <div class="file-card-info">
-                    <div class="file-card-name" id="fileName"></div>
-                    <div class="file-card-size" id="fileSize"></div>
-                </div>
-                <button type="button" class="file-card-remove" id="removeBtn">
-                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <line x1="18" y1="6" x2="6" y2="18"/>
-                        <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
+            <div class="progress" id="progress" aria-hidden="true">
+                <div class="progress-track"></div>
+                <div class="progress-bar"></div>
+            </div>
+
+            <div class="meta-strip">MAX 50MB</div>
+
+            <div class="submit-row">
+                <button type="submit" class="submit" id="submitBtn">
+                    <span class="submit-rule" aria-hidden="true"></span>
+                    <span class="submit-label">送信</span>
+                    <span class="submit-arrow" aria-hidden="true">→</span>
                 </button>
             </div>
-
-            <div class="progress" id="progress">
-                <div class="progress-bar">
-                    <div class="progress-fill"></div>
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-primary" id="submitBtn">
-                <span class="btn-label">アップロード</span>
-            </button>
         </form>
-    </div>
+    </main>
 
-    <div class="modal-overlay" id="modal">
-        <div class="modal">
-            <div class="modal-icon" id="modalIcon">
-                <svg id="modalIconSvg" viewBox="0 0 24 24" aria-hidden="true"></svg>
-            </div>
-            <div class="modal-title" id="modalTitle"></div>
-            <div class="modal-message" id="modalMessage"></div>
-            <button type="button" class="modal-btn" id="modalBtn">OK</button>
+    <aside class="notice" id="modal" role="status" aria-live="polite">
+        <div class="notice-inner">
+            <span class="notice-tag" id="modalTitle"></span>
+            <span class="notice-msg" id="modalMessage"></span>
+            <button type="button" class="notice-close" id="modalBtn"
+                    aria-label="閉じる">OK</button>
         </div>
-    </div>
+    </aside>
 
     <script>
         const $ = id => document.getElementById(id);
         const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
         const el = {
-            form: $('uploadForm'),
-            fileInput: $('fileInput'),
-            dropzone: $('dropzone'),
-            fileCard: $('fileCard'),
-            fileName: $('fileName'),
-            fileSize: $('fileSize'),
-            removeBtn: $('removeBtn'),
-            submitBtn: $('submitBtn'),
-            progress: $('progress'),
-            modal: $('modal'),
-            modalIcon: $('modalIcon'),
-            modalIconSvg: $('modalIconSvg'),
-            modalTitle: $('modalTitle'),
+            form:         $('uploadForm'),
+            fileInput:    $('fileInput'),
+            dropzone:     $('dropzone'),
+            fileCard:     $('fileCard'),
+            fileName:     $('fileName'),
+            fileSize:     $('fileSize'),
+            removeBtn:    $('removeBtn'),
+            submitBtn:    $('submitBtn'),
+            progress:     $('progress'),
+            modal:        $('modal'),
+            modalTitle:   $('modalTitle'),
             modalMessage: $('modalMessage'),
-            modalBtn: $('modalBtn')
-        };
-
-        const icons = {
-            success: '<polyline points="20 6 9 17 4 12"/>',
-            error: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
-            warning: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>'
+            modalBtn:     $('modalBtn')
         };
 
         const formatSize = bytes => {
             if (bytes === 0) return '0 B';
-            const k = 1024, sizes = ['B', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return `${(bytes / k ** i).toFixed(i ? 1 : 0)} ${sizes[i]}`;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log2(bytes) / 10);
+            return `${(bytes / 1024 ** i).toFixed(i ? 1 : 0)} ${sizes[i]}`;
         };
 
         const showFile = file => {
@@ -492,23 +588,28 @@
             el.progress.classList.toggle('show', on);
         };
 
+        let dismissTimer = null;
+
         const showModal = (type, title, message) => {
-            el.modalIcon.className = `modal-icon ${type}`;
-            el.modalIconSvg.innerHTML = icons[type];
+            clearTimeout(dismissTimer);
+            el.modal.className = `notice ${type} show`;
             el.modalTitle.textContent = title;
             el.modalMessage.textContent = message;
-            el.modal.classList.add('show');
+            if (type === 'success') dismissTimer = setTimeout(closeModal, 4500);
         };
 
-        const closeModal = () => el.modal.classList.remove('show');
+        const closeModal = () => {
+            el.modal.classList.remove('show');
+        };
 
         const upload = file => new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = e => {
+                const result = e.target.result;
                 google.script.run
                     .withSuccessHandler(resolve)
                     .withFailureHandler(reject)
-                    .uploadFile(e.target.result.split(',')[1], file.name, file.type);
+                    .uploadFile(result.slice(result.indexOf(',') + 1), file.name, file.type);
             };
             reader.onerror = () => reject(new Error('読み込み失敗'));
             reader.readAsDataURL(file);
@@ -535,21 +636,25 @@
             }
         };
 
-        ['dragover', 'dragleave', 'drop'].forEach(type => {
-            el.dropzone.addEventListener(type, e => {
+        ['dragover', 'dragleave', 'drop'].forEach(evtType => {
+            el.dropzone.addEventListener(evtType, e => {
                 e.preventDefault();
-                if (type === 'dragover') el.dropzone.classList.add('active');
-                else {
-                    el.dropzone.classList.remove('active');
-                    if (type === 'drop' && e.dataTransfer.files[0]) {
-                        el.fileInput.files = e.dataTransfer.files;
-                        showFile(e.dataTransfer.files[0]);
-                    }
+                el.dropzone.classList.remove('active');
+                if (e.type === 'dragover') el.dropzone.classList.add('active');
+                else if (e.type === 'drop' && e.dataTransfer.files[0]) {
+                    el.fileInput.files = e.dataTransfer.files;
+                    showFile(e.dataTransfer.files[0]);
                 }
             });
         });
 
         el.dropzone.addEventListener('click', () => el.fileInput.click());
+        el.dropzone.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                el.fileInput.click();
+            }
+        });
         el.fileInput.addEventListener('change', e => e.target.files[0] && showFile(e.target.files[0]));
         el.form.addEventListener('submit', handleSubmit);
         el.removeBtn.addEventListener('click', reset);
