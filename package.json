@@ -1,16 +1,14 @@
 {
 	"name": "gas-simple-uploader",
 	"version": "0.0.0",
-	"type": "module",
+	"private": true,
 	"scripts": {
 		"build": "tsc && cp src/appsscript.json dist/appsscript.json && cp src/index.html dist/index.html",
-		"check": "biome check ./src",
-		"fix": "biome check --write ./src",
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"fix": "biome check --write ./src"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.4.14",
-		"@types/google-apps-script": "^1.0.99",
-		"typescript": "~5.9.3"
+		"@types/google-apps-script": "^2.0.8",
+		"typescript": "^6.0.3"
 	}
 }

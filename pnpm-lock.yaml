@@ -12,11 +12,11 @@ importers:
         specifier: 2.4.14
         version: 2.4.14
       '@types/google-apps-script':
-        specifier: ^1.0.99
-        version: 1.0.100
+        specifier: ^2.0.8
+        version: 2.0.8
       typescript:
-        specifier: ~5.9.3
-        version: 5.9.3
+        specifier: ^6.0.3
+        version: 6.0.3
 
 packages:
 
@@ -77,11 +77,11 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@types/google-apps-script@1.0.100':
-    resolution: {integrity: sha512-POgcjcDbrjYJYf3Av6j5n+z9/z/WulCNh9Gj199HgrcgRLzcQLg5ALw6jdWcgBkzgTLNYZSe7/01aOfiNzzn9g==}
+  '@types/google-apps-script@2.0.8':
+    resolution: {integrity: sha512-mGPmzzdgBu1DlwrjOhFQ8u0se6AF/z4OpaTzOGwNKxwXZjE7J+IssfE3oL24j/S/p6aFiSTIptHZvbyqeZD8vA==}
 
-  typescript@5.9.3:
-    resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
+  typescript@6.0.3:
+    resolution: {integrity: sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==}
     engines: {node: '>=14.17'}
     hasBin: true
 
@@ -122,6 +122,6 @@ snapshots:
   '@biomejs/cli-win32-x64@2.4.14':
     optional: true
 
-  '@types/google-apps-script@1.0.100': {}
+  '@types/google-apps-script@2.0.8': {}
 
-  typescript@5.9.3: {}
+  typescript@6.0.3: {}

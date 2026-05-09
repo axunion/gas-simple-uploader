@@ -62,17 +62,16 @@ clasp deploy --description "update"
 
 ```
 src/
+  appsscript.json   # GAS manifest
   doGet.ts          # Web app entry point
-  uploadFile.ts     # Drive upload logic
   index.html        # Uploader UI
-  appsscript.json
-dist/               # Build output (recommend git ignore)
+  uploadFile.ts     # Drive upload logic
+dist/               # Build output (gitignored)
 ```
 
 ## Scripts
 
 | Command | Description |
 |---|---|
-| `pnpm build` | Compile TypeScript to `dist/` |
-| `pnpm check` | Lint and format check with Biome |
-| `pnpm fix` | Auto-fix with Biome |
+| `pnpm build` | Compile TypeScript to `dist/` and copy static assets |
+| `pnpm fix` | Lint, format, and auto-fix with Biome |
