@@ -78,7 +78,7 @@
 
         .display {
             font-family: var(--font-serif);
-            font-size: clamp(26px, 8.5vw, 88px);
+            font-size: clamp(32px, 8vw, 80px);
             font-weight: 600;
             letter-spacing: -0.02em;
             line-height: 0.95;
@@ -100,7 +100,7 @@
         #uploadForm {
             display: flex;
             flex-direction: column;
-            gap: clamp(14px, 2vw, 22px);
+            gap: clamp(16px, 2vw, 24px);
         }
 
         /* ── DROPZONE WRAP ── */
@@ -113,9 +113,7 @@
         /* ── DROPZONE ── */
 
         .dropzone {
-            display: flex;
-            align-items: center;
-            gap: 20px;
+            position: relative;
             padding: clamp(28px, 5vw, 48px) clamp(20px, 4vw, 36px);
             min-height: clamp(160px, 24vw, 220px);
             border: 1px solid var(--hairline);
@@ -125,7 +123,7 @@
             outline: none;
         }
 
-        .dropzone:hover {
+        .dropzone[data-state="empty"]:hover {
             border-color: var(--hairline-strong);
             background: var(--surface);
         }
@@ -140,6 +138,33 @@
             outline-offset: 3px;
         }
 
+        .dropzone[data-state="filled"] {
+            cursor: default;
+            pointer-events: none;
+        }
+
+        /* ── DROPZONE INNER STATES ── */
+
+        .dz-empty {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .dz-filled {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .dropzone[data-state="filled"] .dz-empty { display: none; }
+        .dropzone[data-state="filled"] .dz-filled { display: flex; }
+
+        /* ── EMPTY STATE ── */
+
         .plus {
             font-size: 28px;
             font-weight: 300;
@@ -151,7 +176,7 @@
                         transform var(--dur-2) var(--ease);
         }
 
-        .dropzone:hover .plus,
+        .dropzone[data-state="empty"]:hover .plus,
         .dropzone.active .plus {
             color: var(--accent);
             transform: rotate(90deg);
@@ -160,39 +185,31 @@
         .dz-text {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 5px;
         }
 
         .dz-primary {
             font-size: 15px;
             font-weight: 500;
             letter-spacing: -0.005em;
-            line-height: 1.3;
+            line-height: 1.35;
             color: var(--ink);
         }
 
         .dz-hint {
             font-size: 13px;
             font-weight: 400;
-            line-height: 1.45;
+            line-height: 1.5;
             color: var(--ink-muted);
         }
 
-        /* ── FILE ROW ── */
+        /* ── FILLED STATE ── */
 
-        .file-row {
-            display: none;
-            align-items: baseline;
-            gap: 24px;
-            padding: 18px 0;
-            border-top: 1px solid var(--hairline);
-            border-bottom: 1px solid var(--hairline);
-        }
-
-        .file-row.show {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) auto auto;
-            animation: fadeIn var(--dur-2) var(--ease);
+        .dz-file-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 0;
         }
 
         .filename {
@@ -216,7 +233,6 @@
             color: var(--ink-muted);
             font-feature-settings: "tnum" 1;
             font-variant-numeric: tabular-nums lining-nums;
-            white-space: nowrap;
         }
 
         .remove {
@@ -228,7 +244,8 @@
             line-height: 1;
             color: var(--ink-muted);
             cursor: pointer;
-            padding: 4px 0 4px 8px;
+            padding: 8px;
+            flex-shrink: 0;
             transition: color var(--dur-1) var(--ease);
         }
 
@@ -240,6 +257,10 @@
             outline-offset: 3px;
         }
 
+        .dropzone[data-state="filled"] .remove {
+            pointer-events: auto;
+        }
+
         /* ── FILE INPUT ── */
 
         .file-input { display: none; }
@@ -247,13 +268,13 @@
         /* ── PROGRESS ── */
 
         .progress {
-            display: none;
             position: relative;
             height: 1px;
             width: min(720px, 100%);
+            visibility: hidden;
         }
 
-        .progress.show { display: block; }
+        .progress.show { visibility: visible; }
 
         .progress-track {
             position: absolute;
@@ -265,8 +286,13 @@
             position: absolute;
             top: 0;
             bottom: 0;
-            width: 30%;
+            left: 0;
+            width: 100%;
+            transform-origin: left center;
             background: var(--accent);
+        }
+
+        .progress.show .progress-bar {
             animation: sweep 1.6s var(--ease-io) infinite;
         }
 
@@ -299,7 +325,7 @@
             background: transparent;
             border: 0;
             font-family: var(--font-sans);
-            font-size: 17px;
+            font-size: 18px;
             font-weight: 500;
             letter-spacing: -0.01em;
             line-height: 1;
@@ -336,7 +362,7 @@
 
         .submit-rule {
             display: inline-block;
-            width: 56px;
+            width: 64px;
             height: 1px;
             background: currentColor;
             flex-shrink: 0;
@@ -345,7 +371,7 @@
 
         .submit.show:hover .submit-rule,
         .submit.show:focus-visible .submit-rule {
-            width: 88px;
+            width: 96px;
         }
 
         .submit-arrow {
@@ -360,55 +386,73 @@
 
         .submit.loading .submit-arrow { opacity: 0; }
 
-        /* ── NOTICE BANNER ── */
+        /* ── MODAL OVERLAY ── */
 
-        .notice {
+        .modal-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: var(--ink);
-            transform: translateY(-100%);
-            transition: transform var(--dur-3) var(--ease);
-            z-index: 100;
-        }
-
-        .notice.show { transform: translateY(0); }
-
-        .notice-inner {
+            inset: 0;
+            background: rgba(19, 19, 16, 0.42);
             display: flex;
             align-items: center;
-            gap: 20px;
-            padding: 14px clamp(20px, 4vw, 56px);
+            justify-content: center;
+            padding: clamp(20px, 4vw, 56px);
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity var(--dur-2) var(--ease),
+                        visibility 0s var(--dur-2);
         }
 
-        .notice-tag {
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transition: opacity var(--dur-2) var(--ease),
+                        visibility 0s 0s;
+        }
+
+        /* ── MODAL CARD ── */
+
+        .modal-card {
+            background: var(--surface);
+            border: 1px solid var(--hairline);
+            padding: clamp(28px, 4vw, 40px);
+            width: min(420px, 100%);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .modal-tag {
             font-family: var(--font-mono);
             font-size: 11px;
             font-weight: 500;
             letter-spacing: 0.14em;
             text-transform: uppercase;
-            color: var(--bg);
-            border: 1px solid var(--bg);
-            padding: 3px 8px;
             line-height: 1.4;
-            white-space: nowrap;
-            flex-shrink: 0;
+            color: var(--ink);
+            border: 1px solid var(--hairline-strong);
+            padding: 3px 8px;
+            align-self: flex-start;
         }
 
-        .notice.error .notice-tag   { color: #FFB4B4; border-color: #FFB4B4; }
-        .notice.warning .notice-tag { color: #FFD08A; border-color: #FFD08A; }
+        .modal-overlay[data-type="error"]   .modal-tag { color: var(--accent); border-color: var(--accent); }
+        .modal-overlay[data-type="warning"] .modal-tag { color: #A86B00; border-color: #A86B00; }
 
-        .notice-msg {
-            font-size: 14px;
+        .modal-message {
+            font-size: 15px;
             font-weight: 400;
-            color: var(--bg);
-            line-height: 1.45;
-            flex: 1;
-            min-width: 0;
+            line-height: 1.55;
+            color: var(--ink);
         }
 
-        .notice-close {
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
             appearance: none;
             background: transparent;
             border: 0;
@@ -417,20 +461,19 @@
             font-weight: 500;
             letter-spacing: 0.14em;
             text-transform: uppercase;
-            color: var(--bg);
+            color: var(--ink-muted);
             cursor: pointer;
-            padding: 4px 8px;
+            padding: 4px 0;
             text-decoration: underline;
             text-underline-offset: 4px;
-            white-space: nowrap;
-            flex-shrink: 0;
+            transition: color var(--dur-1) var(--ease);
         }
 
-        .notice-close:hover { text-decoration-thickness: 2px; }
+        .modal-btn:hover { color: var(--accent); }
 
-        .notice-close:focus-visible {
-            text-decoration-thickness: 2px;
-            outline: 1px solid var(--bg);
+        .modal-btn:focus-visible {
+            color: var(--accent);
+            outline: 1px solid var(--accent);
             outline-offset: 3px;
         }
 
@@ -441,15 +484,10 @@
             to   { opacity: 1; transform: translateY(0); }
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to   { opacity: 1; }
-        }
-
         @keyframes sweep {
-            0%   { left: -30%; width: 30%; }
-            50%  { left:  35%; width: 40%; }
-            100% { left: 100%; width: 20%; }
+            0%   { transform: translateX(-100%) scaleX(0.3); }
+            50%  { transform: translateX(30%)   scaleX(0.4); }
+            100% { transform: translateX(100%)  scaleX(0.2); }
         }
 
         /* ── REDUCED MOTION ── */
@@ -459,23 +497,25 @@
             .rule,
             .dropzone-wrap,
             .meta-strip,
-            .submit-row,
-            .file-row.show {
+            .submit-row {
                 animation: none;
             }
             .dropzone,
             .plus,
+            .dropzone[data-state="filled"] .remove,
             .remove,
             .submit,
             .submit-rule,
-            .submit-arrow,
-            .notice {
+            .submit-arrow {
                 transition: none;
             }
-            .progress-bar {
+            .modal-overlay,
+            .modal-overlay.show {
+                transition: none;
+            }
+            .progress.show .progress-bar {
                 animation: none;
-                left: 0;
-                width: 100%;
+                transform: none;
                 opacity: 0.5;
             }
         }
@@ -489,20 +529,25 @@
 
         <form id="uploadForm">
             <div class="dropzone-wrap">
-                <div class="dropzone" id="dropzone" tabindex="0" role="button"
+                <div class="dropzone" id="dropzone" data-state="empty" tabindex="0" role="button"
                      aria-label="ファイルを選択またはドラッグ＆ドロップ">
-                    <span class="plus" aria-hidden="true">＋</span>
-                    <div class="dz-text">
-                        <span class="dz-primary">ファイルを選択</span>
-                        <span class="dz-hint">またはドラッグ＆ドロップ</span>
-                    </div>
-                </div>
 
-                <div class="file-row" id="fileCard">
-                    <span class="filename" id="fileName"></span>
-                    <span class="filesize" id="fileSize"></span>
-                    <button type="button" class="remove" id="removeBtn"
-                            aria-label="ファイルを取り消す">✕</button>
+                    <div class="dz-empty">
+                        <span class="plus" aria-hidden="true">＋</span>
+                        <div class="dz-text">
+                            <span class="dz-primary">ファイルを選択</span>
+                            <span class="dz-hint">またはドラッグ＆ドロップ</span>
+                        </div>
+                    </div>
+
+                    <div class="dz-filled">
+                        <div class="dz-file-meta">
+                            <span class="filename" id="fileName"></span>
+                            <span class="filesize" id="fileSize"></span>
+                        </div>
+                        <button type="button" class="remove" id="removeBtn"
+                                aria-label="ファイルを取り消す">✕</button>
+                    </div>
                 </div>
             </div>
 
@@ -525,24 +570,26 @@
         </form>
     </main>
 
-    <aside class="notice" id="modal" role="status" aria-live="polite">
-        <div class="notice-inner">
-            <span class="notice-tag" id="modalTitle"></span>
-            <span class="notice-msg" id="modalMessage"></span>
-            <button type="button" class="notice-close" id="modalBtn"
-                    aria-label="閉じる">OK</button>
+    <div class="modal-overlay" id="modal" role="dialog" aria-modal="true"
+         aria-labelledby="modalTitle" aria-describedby="modalMessage">
+        <div class="modal-card">
+            <span class="modal-tag" id="modalTitle"></span>
+            <p class="modal-message" id="modalMessage"></p>
+            <div class="modal-actions">
+                <button type="button" class="modal-btn" id="modalBtn">OK</button>
+            </div>
         </div>
-    </aside>
+    </div>
 
     <script>
         const $ = id => document.getElementById(id);
         const MAX_FILE_SIZE = 50 * 1024 * 1024;
+        const ERR_UPLOAD = 'アップロードに失敗しました。時間をおいて再度お試しください';
 
         const el = {
             form:         $('uploadForm'),
             fileInput:    $('fileInput'),
             dropzone:     $('dropzone'),
-            fileCard:     $('fileCard'),
             fileName:     $('fileName'),
             fileSize:     $('fileSize'),
             removeBtn:    $('removeBtn'),
@@ -557,7 +604,7 @@
         const formatSize = bytes => {
             if (bytes === 0) return '0 B';
             const sizes = ['B', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log2(bytes) / 10);
+            const i = Math.min(3, Math.floor(Math.log(bytes) / Math.log(1024)));
             return `${(bytes / 1024 ** i).toFixed(i ? 1 : 0)} ${sizes[i]}`;
         };
 
@@ -568,14 +615,12 @@
             }
             el.fileName.textContent = file.name;
             el.fileSize.textContent = formatSize(file.size);
-            el.dropzone.style.display = 'none';
-            el.fileCard.classList.add('show');
+            el.dropzone.dataset.state = 'filled';
             el.submitBtn.classList.add('show');
         };
 
         const reset = () => {
-            el.dropzone.style.display = '';
-            el.fileCard.classList.remove('show');
+            el.dropzone.dataset.state = 'empty';
             el.submitBtn.classList.remove('show');
             el.progress.classList.remove('show');
             el.fileInput.value = '';
@@ -589,27 +634,44 @@
         };
 
         let dismissTimer = null;
+        let lastFocus = null;
+        let hideTimer = null;
+        let modalRaf = 0;
 
         const showModal = (type, title, message) => {
             clearTimeout(dismissTimer);
-            el.modal.className = `notice ${type} show`;
+            clearTimeout(hideTimer);
+            cancelAnimationFrame(modalRaf);
+            if (!el.modal.classList.contains('show')) lastFocus = document.activeElement;
+            el.modal.dataset.type = type;
             el.modalTitle.textContent = title;
             el.modalMessage.textContent = message;
+            modalRaf = requestAnimationFrame(() => {
+                el.modal.classList.add('show');
+                el.modalBtn.focus();
+            });
             if (type === 'success') dismissTimer = setTimeout(closeModal, 4500);
         };
 
         const closeModal = () => {
+            clearTimeout(dismissTimer);
             el.modal.classList.remove('show');
+            hideTimer = setTimeout(() => lastFocus?.focus(), 240);
         };
 
         const upload = file => new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = e => {
                 const result = e.target.result;
-                google.script.run
-                    .withSuccessHandler(resolve)
-                    .withFailureHandler(reject)
-                    .uploadFile(result.slice(result.indexOf(',') + 1), file.name, file.type);
+                try {
+                    const sep = result.slice(0, 128).indexOf(',');
+                    google.script.run
+                        .withSuccessHandler(resolve)
+                        .withFailureHandler(reject)
+                        .uploadFile(result.slice(sep + 1), file.name, file.type);
+                } catch (err) {
+                    reject(err);
+                }
             };
             reader.onerror = () => reject(new Error('読み込み失敗'));
             reader.readAsDataURL(file);
@@ -627,39 +689,51 @@
                     showModal('success', '完了', 'アップロードが完了しました');
                     reset();
                 } else {
-                    showModal('error', '失敗', 'アップロードに失敗しました');
+                    showModal('error', 'エラー', ERR_UPLOAD);
                 }
-            } catch (err) {
-                showModal('error', 'エラー', err.message || 'エラーが発生しました');
+            } catch {
+                showModal('error', 'エラー', ERR_UPLOAD);
             } finally {
                 setLoading(false);
             }
         };
 
-        ['dragover', 'dragleave', 'drop'].forEach(evtType => {
-            el.dropzone.addEventListener(evtType, e => {
-                e.preventDefault();
-                el.dropzone.classList.remove('active');
-                if (e.type === 'dragover') el.dropzone.classList.add('active');
-                else if (e.type === 'drop' && e.dataTransfer.files[0]) {
-                    el.fileInput.files = e.dataTransfer.files;
-                    showFile(e.dataTransfer.files[0]);
-                }
-            });
+        el.dropzone.addEventListener('dragover', e => {
+            e.preventDefault();
+            if (el.dropzone.dataset.state === 'filled') return;
+            el.dropzone.classList.add('active');
+        });
+        el.dropzone.addEventListener('dragleave', e => {
+            e.preventDefault();
+            el.dropzone.classList.remove('active');
+        });
+        el.dropzone.addEventListener('drop', e => {
+            e.preventDefault();
+            el.dropzone.classList.remove('active');
+            if (el.dropzone.dataset.state === 'filled') return;
+            if (e.dataTransfer.files[0]) {
+                el.fileInput.files = e.dataTransfer.files;
+                showFile(e.dataTransfer.files[0]);
+            }
         });
 
-        el.dropzone.addEventListener('click', () => el.fileInput.click());
+        el.dropzone.addEventListener('click', () => {
+            if (el.dropzone.dataset.state === 'empty') el.fileInput.click();
+        });
         el.dropzone.addEventListener('keydown', e => {
-            if (e.key === 'Enter' || e.key === ' ') {
+            if ((e.key === 'Enter' || e.key === ' ') && el.dropzone.dataset.state === 'empty') {
                 e.preventDefault();
                 el.fileInput.click();
             }
         });
         el.fileInput.addEventListener('change', e => e.target.files[0] && showFile(e.target.files[0]));
         el.form.addEventListener('submit', handleSubmit);
-        el.removeBtn.addEventListener('click', reset);
+        el.removeBtn.addEventListener('click', e => { e.stopPropagation(); reset(); });
         el.modalBtn.addEventListener('click', closeModal);
         el.modal.addEventListener('click', e => e.target === el.modal && closeModal());
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && el.modal.classList.contains('show')) closeModal();
+        });
     </script>
 </body>
 </html>
